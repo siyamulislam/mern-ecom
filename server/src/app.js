@@ -5,6 +5,7 @@ const createError = require('http-errors');
 const xssClean = require('xss-clean');
 const rateLimit = require('express-rate-limit');
 const userRouter = require("./routers/userRouter");
+const seedRouter = require("./routers/seedRouter");
 
 const app = express();
 // API security to prevent DDos Attack
@@ -28,6 +29,7 @@ app.use(xssClean());
 // Apply isLoggedIn middleware for all routes below this line
 // app.use(isLoggedIn);
 app.use('/api/user',userRouter);
+app.use('/api/seed',seedRouter);
 
 
 app.get("/test",(req, res) => { res.send("Welcome - API is working..."); });
