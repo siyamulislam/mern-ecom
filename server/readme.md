@@ -8,3 +8,4 @@ npm i body-parser http-errors
 
 ## API Security
 npm i xss-clean express-rate-limit
+npm i dotenv
