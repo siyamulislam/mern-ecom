@@ -11,3 +11,4 @@ npm i xss-clean express-rate-limit
 npm i dotenv
 <!-- mongoDB -->
 npm i mongoose
+npm i bcrypt
