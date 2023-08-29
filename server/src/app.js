@@ -1,7 +1,7 @@
 const bodyParser = require("body-parser");
 const express = require("express");
 const morgan = require("morgan");
-
+const createError = require('http-errors')
 const app = express();
 app.use(morgan('dev'));
 app.use(bodyParser.json());
@@ -31,14 +31,18 @@ app.get("/", (req, res) => {
 });
 
 // client error handling
+app.use((req, res, next) => { 
+    next( createError(404, 'your route not found'));
+});
+// server error handling- if missing any error handel
 app.use((err,req, res, next) => {
+    return res.status(err.status || 500).json({
+        success:false,
+        message: err.message 
+    })
     console.error(err.stack);
     res.status(500).json({ message: "Something broken!" });
-    next();
-});
-// server error handling
-app.use((req, res, next) => {
-    res.status(404).json({ message: "route not found" })
+    
 });
 
 
