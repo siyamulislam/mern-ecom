@@ -4,3 +4,4 @@
 npm i express
 npm i --save-dev nodemon
 npm i --save-dev morgan
+npm i body-parser
