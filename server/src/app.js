@@ -6,6 +6,7 @@ const xssClean = require('xss-clean');
 const rateLimit = require('express-rate-limit');
 const userRouter = require("./routers/userRouter");
 const seedRouter = require("./routers/seedRouter");
+const { errorResponse } = require("./controllers/responseController");
 
 const app = express();
 // API security to prevent DDos Attack
@@ -41,10 +42,7 @@ app.use((req, res, next) => {
 });
 // server error handling- if missing any error handel
 app.use((err,req, res, next) => {
-    return res.status(err.status || 500).json({
-        success:false,
-        message: err.message 
-    })
+    return errorResponse(res,{statusCode:err.statusCode,message:err.message})
 });
 
 module.exports =app;

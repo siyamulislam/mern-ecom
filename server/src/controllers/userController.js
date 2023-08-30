@@ -1,5 +1,6 @@
 const createHttpError = require("http-errors");
 const User = require("../models/userModel");
+const { successResponse } = require("./responseController");
 
 
 const getUsers = async (req, res, next) => {
@@ -18,19 +19,23 @@ const getUsers = async (req, res, next) => {
     };
     const options = { password: 0, __v: 0 };
     const users = await User.find(filter, options).limit(limit).skip((page - 1) * limit);
-    const userCount =await User.find(filter).countDocuments();
+    const userCount = await User.find(filter).countDocuments();
 
-    if(!users || userCount===0)  throw createHttpError(404, "no user found!");
-    res.status(200).send({
+    if (!users || userCount === 0) throw createHttpError(404, "no user found!");
+   
+    return successResponse(res, {
+      statusCode: 200,
       message: `${userCount} users successfully fetched`,
-      pagination:{ 
-        totalPages:Math.ceil(userCount /limit),
-        currentPage:page,
-        prevPage:page > 1 ? page-1 : null,
-        nextPage:page < Math.ceil(userCount /limit) ? page+1 : null,
-      }, 
-      users: users,
-    });
+      payload: {
+        pagination: {
+          totalPages: Math.ceil(userCount / limit),
+          currentPage: page,
+          prevPage: page > 1 ? page - 1 : null,
+          nextPage: page < Math.ceil(userCount / limit) ? page + 1 : null,
+        },
+        users: users,
+      },
+    })
   } catch (error) {
     next(error);
   }
