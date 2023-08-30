@@ -1,11 +1,11 @@
 const createError = require("http-errors");
-const fs = require("fs");
 
 const User = require("../models/userModel");
 const { successResponse } = require("./responseController");
 const { default: mongoose } = require("mongoose");
 const { findWithId } = require("../services/findItem");
-const { defaultImagePath } = require("../secret");
+const { defaultImagePath } = require("../secret"); 
+const { deleteImage } = require("../helper.js/deleteImage");
 
 
 const getUsers = async (req, res, next) => {
@@ -25,7 +25,6 @@ const getUsers = async (req, res, next) => {
     const options = { password: 0, __v: 0 };
     const users = await User.find(filter, options).limit(limit).skip((page - 1) * limit);
     const userCount = await User.find(filter).countDocuments();
-    console.log(users)
     if (!users || userCount === 0) throw createError(404, "no user found!");
 
     return successResponse(res, {
@@ -70,26 +69,17 @@ const deleteUserById = async (req, res, next) => {
     const id = req.params.id;
     const options = { password: 0, __v: 0 };
     const user = await findWithId(User, id, options);
-    const deletedUser = await User.findByIdAndDelete({ _id: id, isAdmin: false });
-    const userImagePath = deletedUser.image;
-    fs.access(userImagePath, (err) => {
-      if (err) { console.error('User image dose not exist!'); }
-      if (userImagePath === defaultImagePath) { return; }
-      else {
-        fs.unlink(userImagePath, (err) => {
-          if (err) throw err;
-          console.log('User Image Successfully Deleted');
-        });
-      }
-    });
-    if (user) {
+    const userImagePath = user.image;
+    await User.findByIdAndDelete({ _id: id, isAdmin: false });
 
+    if (userImagePath !== defaultImagePath) {
+      deleteImage(userImagePath);
     }
+
     return successResponse(res, {
       statusCode: 200,
       message: `${id} user successfully deleted!`,
-      payload: { deleteUser }
-
+      payload: { user }
     })
   } catch (error) {
     if (error instanceof mongoose.Error) {
