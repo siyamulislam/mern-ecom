@@ -1,6 +1,7 @@
-const createHttpError = require("http-errors");
+const createError = require("http-errors");
 const User = require("../models/userModel");
 const { successResponse } = require("./responseController");
+const { default: mongoose } = require("mongoose");
 
 
 const getUsers = async (req, res, next) => {
@@ -20,9 +21,9 @@ const getUsers = async (req, res, next) => {
     const options = { password: 0, __v: 0 };
     const users = await User.find(filter, options).limit(limit).skip((page - 1) * limit);
     const userCount = await User.find(filter).countDocuments();
+    console.log(users)
+    if (!users || userCount === 0) throw createError(404, "no user found!");
 
-    if (!users || userCount === 0) throw createHttpError(404, "no user found!");
-   
     return successResponse(res, {
       statusCode: 200,
       message: `${userCount} users successfully fetched`,
@@ -40,5 +41,28 @@ const getUsers = async (req, res, next) => {
     next(error);
   }
 }
+const getUser = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const options = { password: 0, __v: 0 };
+    const user = await User.findById(id, options);
+    console.log('User:', user);
 
-module.exports = { getUsers };
+    if (!user) {return next(error);}
+
+    return successResponse(res, {
+      statusCode: 200,
+      message: `${id} user successfully found!`,
+      payload: user
+
+    })
+  } catch (error) {
+    if(error instanceof mongoose.Error){
+    next(createError(400,'Invalid User id!'));
+    return;
+    }
+    next(error);
+  }
+}
+
+module.exports = { getUsers, getUser };
