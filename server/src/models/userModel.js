@@ -2,13 +2,6 @@ const { Schema,model } = require("mongoose");
 const bcrypt = require('bcrypt');
 const { defaultImagePath } = require("../secret");
 
- 
-const users = [
-    { id: 1, name: "siyamul", email: 'siyamul.cse@gmail.com' },
-    { id: 2, name: "siyamul2", email: 'siyamul2.cse@gmail.com' },
-    { id: 3, name: "siyamul3", email: 'siyamul3.cse@gmail.com' },
-];
-
 const userSchema = new Schema({
     name: {
         type: String,
@@ -65,4 +58,4 @@ const userSchema = new Schema({
 );
 const User = model('Users',userSchema);
 
-module.exports = {users,User};
+module.exports = User;

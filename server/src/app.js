@@ -28,7 +28,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(xssClean());
 // Apply isLoggedIn middleware for all routes below this line
 // app.use(isLoggedIn);
-app.use('/api/user',userRouter);
+app.use('/api/users',userRouter);
 app.use('/api/seed',seedRouter);
 
 

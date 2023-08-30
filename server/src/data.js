@@ -6,6 +6,15 @@ const data = {
             password: '123456',
             phone: '01717338996',
             address: 'Dhaka, Bangladesh',
+            isAdmin:true
+        },
+        { 
+            name: "siam", 
+            email: 'siam.cse@gmail.com' ,
+            password: '123456',
+            phone: '01518730004',
+            address: 'Bogra, Bangladesh',
+            isAdmin:false
         },
         {
             name: "John Doe",
