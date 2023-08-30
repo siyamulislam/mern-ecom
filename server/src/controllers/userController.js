@@ -45,12 +45,12 @@ const getUsers = async (req, res, next) => {
     next(error);
   }
 }
-const getUser = async (req, res, next) => {
+const getUserById = async (req, res, next) => {
   try {
     const id = req.params.id;
     const options = { password: 0, __v: 0 };
 
-    const user = await findWithId(id, options);
+    const user = await findWithId(User, id, options);
     return successResponse(res, {
       statusCode: 200,
       message: `${id} user successfully found!`,
@@ -65,11 +65,11 @@ const getUser = async (req, res, next) => {
     next(error);
   }
 }
-const deleteUser = async (req, res, next) => {
+const deleteUserById = async (req, res, next) => {
   try {
     const id = req.params.id;
     const options = { password: 0, __v: 0 };
-    const user = await findWithId(id, options);
+    const user = await findWithId(User, id, options);
     const deletedUser = await User.findByIdAndDelete({ _id: id, isAdmin: false });
     const userImagePath = deletedUser.image;
     fs.access(userImagePath, (err) => {
@@ -100,4 +100,4 @@ const deleteUser = async (req, res, next) => {
   }
 }
 
-module.exports = { getUsers, getUser, deleteUser };
+module.exports = { getUsers, getUserById, deleteUserById };
