@@ -1,8 +1,11 @@
 const createError = require("http-errors");
+const fs = require("fs");
+
 const User = require("../models/userModel");
 const { successResponse } = require("./responseController");
 const { default: mongoose } = require("mongoose");
-const { findUserById } = require("../services/findUser");
+const { findWithId } = require("../services/findItem");
+const { defaultImagePath } = require("../secret");
 
 
 const getUsers = async (req, res, next) => {
@@ -45,11 +48,47 @@ const getUsers = async (req, res, next) => {
 const getUser = async (req, res, next) => {
   try {
     const id = req.params.id;
-    const user = await findUserById(id);
+    const options = { password: 0, __v: 0 };
+
+    const user = await findWithId(id, options);
     return successResponse(res, {
       statusCode: 200,
       message: `${id} user successfully found!`,
-      payload: {user}
+      payload: { user }
+
+    })
+  } catch (error) {
+    if (error instanceof mongoose.Error) {
+      next(createError(400, 'Invalid User id!'));
+      return;
+    }
+    next(error);
+  }
+}
+const deleteUser = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const options = { password: 0, __v: 0 };
+    const user = await findWithId(id, options);
+    const deletedUser = await User.findByIdAndDelete({ _id: id, isAdmin: false });
+    const userImagePath = deletedUser.image;
+    fs.access(userImagePath, (err) => {
+      if (err) { console.error('User image dose not exist!'); }
+      if (userImagePath === defaultImagePath) { return; }
+      else {
+        fs.unlink(userImagePath, (err) => {
+          if (err) throw err;
+          console.log('User Image Successfully Deleted');
+        });
+      }
+    });
+    if (user) {
+
+    }
+    return successResponse(res, {
+      statusCode: 200,
+      message: `${id} user successfully deleted!`,
+      payload: { deleteUser }
 
     })
   } catch (error) {
@@ -61,4 +100,4 @@ const getUser = async (req, res, next) => {
   }
 }
 
-module.exports = { getUsers, getUser };
+module.exports = { getUsers, getUser, deleteUser };
