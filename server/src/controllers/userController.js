@@ -96,6 +96,8 @@ const deleteUserById = async (req, res, next) => {
 const processRegister = async (req, res, next) => {
   try {
     const { name, email, password, phone, address } = req.body;
+    // console.log(email);
+    // return;
     const userExists = await User.exists({ email: email });
     if (userExists) throw createError(409, `${email} email already exist! please try login...`);
     // create jwt token
@@ -113,12 +115,12 @@ const processRegister = async (req, res, next) => {
       `
     }
     // send mail with nodemailer
-    try {
-      await sendEmailWithNodeMailer(emailData);
-    } catch (error) {
-      next(createError(500, 'failed to send verification email'));
-      return;
-    }
+    // try {
+    //   await sendEmailWithNodeMailer(emailData);
+    // } catch (error) {
+    //   next(createError(500, 'failed to send verification email'));
+    //   return;
+    // }
     return successResponse(res, {
       statusCode: 200,
       message: `Please check your email:${email} to for complete your registrations!`,

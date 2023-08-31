@@ -8,7 +8,7 @@ const successResponse =(res, {statusCode=200,message="Success!",payload={}})=>{
 const errorResponse =(res, {statusCode=500,message="Internal Server Error!"})=>{
     return res.status(statusCode).json({
         success:false,
-        message: message ,
+        message: message,
     });
 }
 module.exports = {successResponse,errorResponse};
