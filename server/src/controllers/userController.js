@@ -5,7 +5,7 @@ const User = require("../models/userModel");
 const { successResponse } = require("./responseController");
 const { default: mongoose } = require("mongoose");
 const { findWithId } = require("../services/findItem");
-const { defaultImagePath, jwtActivationKey, clientURL } = require("../secret");
+const { defaultImagePath, jwtActivationKey, clientURL, serverURL } = require("../secret");
 const { deleteImage } = require("../helper/deleteImage");
 const { createJSONWebToken } = require("../helper/jwt");
 const sendEmailWithNodeMailer = require("../helper/sendEmail");
@@ -108,7 +108,7 @@ const processRegister = async (req, res, next) => {
       html: ` 
         <h2>Welcome, ${name}!</h2>
         <p>Please click here to 
-        <a href="${clientURL}/api/users/activate/token=${token}" target="_blank">activate your account</a>
+        <a href="${serverURL}/api/users/activate?token=${token}" target="_blank">activate your account</a>
         </p>
       `
     }
@@ -130,7 +130,7 @@ const processRegister = async (req, res, next) => {
 }
 const activateUserAccount = async (req, res, next) => {
   try {
-    const token = req.body.token;
+    const token = req.body.token; 
     if (!token) throw createError(404, 'token not found!');
     try {
       const decoded = jwt.verify(token, jwtActivationKey);
@@ -157,5 +157,36 @@ const activateUserAccount = async (req, res, next) => {
 
     next(error);
   }
-}
-module.exports = { activateUserAccount, processRegister, getUsers, getUserById, deleteUserById };
+} 
+const activateUser = async (req, res, next) => {
+  try {
+    const token = req.query.token ;
+
+    if (!token) throw createError(404, 'token not found!');
+    try {
+      const decoded = jwt.verify(token, jwtActivationKey);
+      if (!decoded) throw createError(401, 'Unable to verify user by!')
+      decoded.isVerified = true;
+      console.log(decoded)
+
+      const userExists = await User.exists({ email: decoded.email });
+      if (userExists) throw createError(409, `User ${decoded.email} email already exist and verified! please login and chill...`);
+      await User.create(decoded);
+      return successResponse(res, {
+        statusCode: 201,
+        message: `User is successfully verified & registered!`,
+      })
+    } catch (error) {
+      if (error.name === 'TokenExpiredError') throw createError(401, 'Token has expired!');
+      else if (error.name === 'JsonWebTokenError') throw createError(401, 'Invalid token!');
+      else throw error;
+    }
+
+
+
+  } catch (error) {
+
+    next(error);
+  }
+} 
+module.exports = { activateUser,activateUserAccount, processRegister, getUsers, getUserById, deleteUserById };
