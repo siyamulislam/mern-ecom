@@ -1,5 +1,5 @@
 const express = require("express");
-const { getUsers, getUserById, deleteUserById } = require("../controllers/userController");
+const { getUsers, getUserById, deleteUserById, processRegister } = require("../controllers/userController");
 const userRouter = express.Router();
 
 
@@ -10,6 +10,7 @@ const userRouter = express.Router();
 //     res.status(200).send({ name: "siyamul", email: 'siyamul.cse@gmail.com' });
 // });
 // GET: api/users
+userRouter.post('/process-register', processRegister );
 userRouter.get('/', getUsers );
 userRouter.get('/:id', getUserById );
 userRouter.delete('/:id', deleteUserById );

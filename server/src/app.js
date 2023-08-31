@@ -25,7 +25,7 @@ const isLoggedIn = (req, res, next) => {
 
 app.use(morgan('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(xssClean());
 // Apply isLoggedIn middleware for all routes below this line
 // app.use(isLoggedIn);
