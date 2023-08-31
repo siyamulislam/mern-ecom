@@ -1,2 +1,2 @@
-# mern-ecom
-A  MERN Stack E-Commerce Application focused on Backend
+## mern-ecom
+A  MERN Stack E-Commerce Application focused on 

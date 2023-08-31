@@ -4,8 +4,10 @@ const User = require("../models/userModel");
 const { successResponse } = require("./responseController");
 const { default: mongoose } = require("mongoose");
 const { findWithId } = require("../services/findItem");
-const { defaultImagePath } = require("../secret"); 
-const { deleteImage } = require("../helper.js/deleteImage");
+const { defaultImagePath, jwtActivationKey, clientURL } = require("../secret");
+const { deleteImage } = require("../helper/deleteImage");
+const { createJSONWebToken } = require("../helper/jwt");
+const sendEmailWithNodeMailer = require("../helper/sendEmail");
 
 
 const getUsers = async (req, res, next) => {
@@ -64,28 +66,7 @@ const getUserById = async (req, res, next) => {
     next(error);
   }
 }
-const processRegister = async (req, res, next) => {
-  try {
-    const {name,email,password,phone,address} = req.body; 
-    const newUser={name, email,password,phone,address};
-    const userExists = await User.exists({email:email});
-    if(userExists){
-      throw createError(409, 'this email already exist! please try login...');
-    }
-    console.log(userExists)
-    return successResponse(res, {
-      statusCode: 200,
-      message: `${email} user successfully created!`, 
-      payload:newUser
-    })
-  } catch (error) {
-    if (error instanceof mongoose.Error) {
-      next(createError(400, 'Invalid User id!'));
-      return;
-    }
-    next(error);
-  }
-}
+
 const deleteUserById = async (req, res, next) => {
   try {
     const id = req.params.id;
@@ -111,5 +92,43 @@ const deleteUserById = async (req, res, next) => {
     next(error);
   }
 }
+const processRegister = async (req, res, next) => {
+  try {
+    const { name, email, password, phone, address } = req.body;
+    const userExists = await User.exists({ email: email });
+    if (userExists) throw createError(409, `${email} email already exist! please try login...`);
+    // create jwt token
+    const token = createJSONWebToken({ name, email, password, phone, address }, jwtActivationKey, '10m')
 
+    // create email
+    const emailData = {
+      email,
+      subject: 'EcomApp Account Activation Email',
+      html: ` 
+        <h2>Welcome, ${name}!</h2>
+        <p>Please click here to 
+        <a href="${clientURL}/api/users/activate/token=${token}" target="_blank">activate your account</a>
+        </p>
+      `
+    }
+    // send mail with nodemailer
+    try {
+      await sendEmailWithNodeMailer(emailData);
+    } catch (error) {
+      next(createError(500, 'failed to send verification email'));
+      return;
+    }
+    return successResponse(res, {
+      statusCode: 200,
+      message: `Please check your email:${email} to for complete your registrations!`,
+      payload: { token }
+    })
+  } catch (error) {
+    if (error instanceof mongoose.Error) {
+      next(createError(400, 'Registration failed!'));
+      return;
+    }
+    next(error);
+  }
+}
 module.exports = { processRegister, getUsers, getUserById, deleteUserById };
