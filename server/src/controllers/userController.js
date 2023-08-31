@@ -115,6 +115,7 @@ const processRegister = async (req, res, next) => {
       `
     }
     // send mail with nodemailer
+    
     // try {
     //   await sendEmailWithNodeMailer(emailData);
     // } catch (error) {
