@@ -1,6 +1,6 @@
 const express = require("express");
 const { getUsers, getUserById, deleteUserById, processRegister, activateUserAccount, activateUser } = require("../controllers/userController");
-const upload = require("../middlewares/uploadFile");
+const upload = require("../middlewares/fileUpload");
 const userRouter = express.Router();
 
 
