@@ -35,11 +35,12 @@ const userSchema = new Schema({
     },
     phone: {
         type: String,
-        require: [true, 'User phone is required'],  
+        require: [true, 'User phone is required'], 
     },
     address: {
         type: String,
         require: [true, 'User address is required'],  
+        minlength: [3, 'The length of address min 3 char'],
     },
     isAdmin: {
         type: Boolean,
