@@ -18,8 +18,8 @@ const validateUserRegistration = [
         .matches(
             /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/
             // /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/
-            )
-        .withMessage('Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character (@, $, !, %, *, ?, or &)'),    
+        )
+        .withMessage('Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character (@, $, !, %, *, ?, or &)'),
 
     body("address").trim().notEmpty()
         .withMessage("address is required")
