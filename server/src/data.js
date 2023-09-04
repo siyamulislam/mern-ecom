@@ -118,6 +118,7 @@ const data = {
             name: "Mia Martin",
             email: "mia.martin@example.com",
             password: "MartinPass",
+
             phone: "555-444-3333",
             address: "123 Willow St, Nowhere, USA",
           },

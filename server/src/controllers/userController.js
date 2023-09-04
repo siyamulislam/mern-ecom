@@ -93,6 +93,7 @@ const deleteUserById = async (req, res, next) => {
     next(error);
   }
 }
+
 const processRegister = async (req, res, next) => {
   try {
     const { name, email, password, phone, address } = req.body;
@@ -115,7 +116,7 @@ const processRegister = async (req, res, next) => {
       `
     }
     // send mail with nodemailer
-    
+
     // try {
     //   await sendEmailWithNodeMailer(emailData);
     // } catch (error) {
@@ -133,7 +134,7 @@ const processRegister = async (req, res, next) => {
 }
 const activateUserAccount = async (req, res, next) => {
   try {
-    const token = req.body.token; 
+    const token = req.body.token;
     if (!token) throw createError(404, 'token not found!');
     try {
       const decoded = jwt.verify(token, jwtActivationKey);
@@ -160,10 +161,10 @@ const activateUserAccount = async (req, res, next) => {
 
     next(error);
   }
-} 
+}
 const activateUser = async (req, res, next) => {
   try {
-    const token = req.query.token ;
+    const token = req.query.token;
 
     if (!token) throw createError(404, 'token not found!');
     try {
@@ -191,5 +192,42 @@ const activateUser = async (req, res, next) => {
 
     next(error);
   }
-} 
-module.exports = { activateUser,activateUserAccount, processRegister, getUsers, getUserById, deleteUserById };
+}
+const updateUserById = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const options = { password: 0, __v: 0 };
+    const user = await findWithId(User, id, options);
+    const userImagePath = user.image;
+    let updates = {};
+    // console.log(user);
+    if (req.body.name) updates.name = req.body.name;
+    if (req.body.email) updates.email = req.body.email;
+    if (req.body.password) updates.password = req.body.password;
+    if (req.body.phone) updates.phone = req.body.phone;
+    if (req.body.address) updates.address = req.body.address;
+    if (req.file.image) {
+      // updates.image = req.body.image;
+    }
+
+    console.log(updates)
+    // await User.findByIdAndDelete({ _id: id, isAdmin: false });
+
+    if (userImagePath !== defaultImagePath) {
+      deleteImage(userImagePath);
+    }
+
+    return successResponse(res, {
+      statusCode: 200,
+      message: `${id} user successfully updated!`,
+      payload: { user }
+    })
+  } catch (error) {
+    if (error instanceof mongoose.Error) {
+      next(createError(400, 'Invalid User id!'));
+      return;
+    }
+    next(error);
+  }
+}
+module.exports = { activateUser, activateUserAccount, processRegister, getUsers, getUserById, deleteUserById, updateUserById };
