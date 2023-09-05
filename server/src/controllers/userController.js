@@ -206,21 +206,23 @@ const updateUserById = async (req, res, next) => {
     if (req.body.password) updates.password = req.body.password;
     if (req.body.phone) updates.phone = req.body.phone;
     if (req.body.address) updates.address = req.body.address;
-    if (req.file.image) {
-      // updates.image = req.body.image;
-    }
+    // if (req.file.image) {
+    //   // updates.image = req.body.image;
+    // }
+    const updatedUser =await User.findByIdAndUpdate(
+      id, updates,  { new: true }
+    );
 
-    console.log(updates)
     // await User.findByIdAndDelete({ _id: id, isAdmin: false });
 
-    if (userImagePath !== defaultImagePath) {
-      deleteImage(userImagePath);
-    }
+    // if (userImagePath !== defaultImagePath) {
+    //   deleteImage(userImagePath);
+    // }
 
     return successResponse(res, {
       statusCode: 200,
       message: `${id} user successfully updated!`,
-      payload: { user }
+      payload: { updatedUser }
     })
   } catch (error) {
     if (error instanceof mongoose.Error) {
